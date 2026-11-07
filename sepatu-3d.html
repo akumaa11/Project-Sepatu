@@ -60,10 +60,11 @@
   }
   .controls {
     position: fixed;
-    left: 50%; transform: translateX(-50%);
+    left: 0; right: 0;
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-    max-width: calc(100% - 32px);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
   .controls button {
     font: inherit; font-size: 0.85rem; font-weight: 500;
@@ -79,9 +80,12 @@
   .hint {
     position: fixed; left: 0; right: 0;
     bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
     text-align: center; font-size: 0.75rem; color: var(--muted);
     pointer-events: none;
   }
+  @media (max-width: 560px) { .hint { bottom: calc(124px + env(safe-area-inset-bottom, 0px)); } }
   @media (prefers-reduced-motion: reduce) { .controls button { transition: none; } }
 </style>
 </head>
@@ -101,6 +105,7 @@
   <button type="button" id="btn-rotate" aria-pressed="true">Putar otomatis</button>
   <button type="button" id="btn-side">Tampak samping</button>
   <button type="button" id="btn-top">Tampak atas</button>
+  <button type="button" id="btn-bottom">Tampak bawah</button>
   <button type="button" id="btn-reset">Reset</button>
 </div>
 
@@ -115,6 +120,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 // ---------- Renderer, scene, camera ----------
 const stage = document.getElementById("stage");
@@ -134,7 +140,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.minDistance = 7;
 controls.maxDistance = 40;
-controls.maxPolarAngle = Math.PI * 0.62;
+controls.maxPolarAngle = Math.PI;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 1.2;
 
@@ -146,6 +152,9 @@ Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8 });
 key.shadow.radius = 6;
 scene.add(key);
 scene.add(new THREE.HemisphereLight(0xfff8f0, 0xb8a898, 0.9));
+const under = new THREE.DirectionalLight(0xfff4ea, 1.1);
+under.position.set(-3, -10, 4);
+scene.add(under);
 
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.18 }));
 ground.rotation.x = -Math.PI / 2;
@@ -202,6 +211,12 @@ function upperNormal(t, v) {
   if (n.dot(out) < 0) n.negate();
   return n;
 }
+
+// v pada ketinggian relatif h (0 = dasar upper, 1 = puncak) di sisi kiri/kanan
+const vAt = (h, side) => {
+  const th = Math.acos(Math.min(1, Math.max(0, h)) ** (1 / 0.7));
+  return side ? 0.5 + th / Math.PI : 0.5 - th / Math.PI;
+};
 
 // Membuat mesh dari grid parametrik
 function gridMesh(nu, nv, pointFn, material, colorFn) {
@@ -303,9 +318,8 @@ const stripeColors = ["#5d9ad6", "#3f78bf", "#1f3f7c"];
 for (const side of [0, 1]) {
   stripeColors.forEach((c, k) => {
     shoe.add(patch((a, b) => {
-      const v = 0.05 + b * 0.31;
-      const t = 0.42 + k * 0.058 + a * 0.042 + b * 0.14;
-      return [t, side ? 1 - v : v];
+      const h = 0.03 + b * 0.8;
+      return [0.41 + k * 0.06 + a * 0.045 + h * 0.17, vAt(h, side)];
     }, 0.02 + k * 0.001, mat(c, { roughness: 0.55 }), 8, 24));
   });
 }
@@ -317,9 +331,12 @@ const rows = 6;
 const lacePt = (i, v) => { const t = 0.5 + i * 0.055; return upperPoint(t, v).add(upperNormal(t, v).multiplyScalar(0.06)); };
 for (let i = 0; i < rows; i++) {
   for (const v of [0.36, 0.64]) {
-    const e = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 8), eyeletMat);
-    e.position.copy(lacePt(i, v));
-    shoe.add(e);
+    const t = 0.5 + i * 0.055, n = upperNormal(t, v);
+    const base = upperPoint(t, v).add(n.clone().multiplyScalar(0.025));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.025, 8, 20), eyeletMat);
+    const hole = new THREE.Mesh(new THREE.CircleGeometry(0.06, 16), mat("#1c1916"));
+    for (const m of [ring, hole]) { m.position.copy(base); m.lookAt(base.clone().add(n)); shoe.add(m); }
+    ring.name = "Eyelet"; hole.name = "Eyelet_dark_center";
   }
   const pairs = [[lacePt(i, 0.36), lacePt(i, 0.64)]];
   if (i < rows - 1) pairs.push([lacePt(i, 0.64), lacePt(i + 1, 0.36)]);
@@ -348,7 +365,102 @@ for (const side of [0, 1]) {
   }
 }
 
+// ---------- Detail tambahan (diambil dari model referensi) ----------
+// Garis jahitan panel & jahitan putus-putus
+const seamParts = [], stitchParts = [];
+function seam(pathFn, { n = 80, offset = 0.022, stitchDt = 0.012, dashes = true } = {}) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const [t, v] = pathFn(i / n);
+    pts.push(upperPoint(t, v).add(upperNormal(t, v).multiplyScalar(offset)));
+  }
+  seamParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), n * 2, 0.014, 6));
+  if (!dashes) return;
+  const sp = [];
+  for (let i = 0; i <= n * 3; i++) {
+    const [t, v] = pathFn(i / (n * 3));
+    const tt = Math.min(1, Math.max(0, t + stitchDt));
+    sp.push(upperPoint(tt, v).add(upperNormal(tt, v).multiplyScalar(offset)));
+  }
+  const curve = new THREE.CatmullRomCurve3(sp);
+  const len = curve.getLength(), dash = 0.07, gap = 0.06;
+  for (let d = 0; d + dash < len; d += dash + gap) {
+    const a = curve.getPointAt(d / len), b = curve.getPointAt((d + dash) / len);
+    stitchParts.push(new THREE.TubeGeometry(new THREE.LineCurve3(a, b), 1, 0.011, 4));
+  }
+}
+const absS = (v) => Math.abs(v - 0.5) * 2;
+for (const side of [0, 1]) {
+  // tepi pelindung ujung & tumit
+  seam((s) => { const h = s * 0.97; const v = vAt(h, side); return [0.86 - 0.05 * absS(v), v]; }, { stitchDt: -0.012 });
+  seam((s) => { const h = s * 0.97; const v = vAt(h, side); return [0.04 + 0.15 * absS(v), v]; }, { stitchDt: 0.012 });
+  // eyestay (sepanjang lubang tali)
+  seam((s) => [0.46 + s * 0.38, side ? 0.69 : 0.31], { stitchDt: 0 });
+  // panel samping dari tumit ke lidah
+  seam((s) => [0.17 + s * 0.27, vAt(0.5 + 0.35 * s * s, side)], { stitchDt: 0 });
+  // garis dekat dasar upper
+  seam((s) => [0.06 + s * 0.86, vAt(0.07, side)], { n: 140, stitchDt: 0 , dashes: true });
+}
+// keliling kerah
+seam((s) => ell(1.24, s * Math.PI * 2), { n: 120, offset: 0.045, stitchDt: 0, dashes: false });
+const seamMesh = new THREE.Mesh(mergeGeometries(seamParts), mat("#c4b8ac", { roughness: 0.9 }));
+seamMesh.name = "Panel_seams";
+const stitchMesh = new THREE.Mesh(mergeGeometries(stitchParts), mat("#8f8379", { roughness: 0.9 }));
+stitchMesh.name = "Stitch_dashes";
+shoe.add(seamMesh, stitchMesh);
+
+// Tab tarik di tumit
+{
+  const pts = [];
+  for (let i = 0; i <= 12; i++) {
+    const k = i / 12;
+    const p = upperPoint(0.004, 0.5);
+    pts.push(new THREE.Vector3(p.x - 0.06 - 0.05 * Math.sin(k * Math.PI), p.y - 0.55 + k * 0.85, 0));
+  }
+  const shape = new THREE.Shape();
+  shape.moveTo(-0.025, -0.2); shape.lineTo(0.025, -0.2); shape.lineTo(0.025, 0.2); shape.lineTo(-0.025, 0.2);
+  const tab = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { steps: 24, bevelEnabled: false, extrudePath: new THREE.CatmullRomCurve3(pts) }), mat("#1d3566", { roughness: 0.6 }));
+  tab.name = "Heel_pull_tab";
+  shoe.add(tab);
+}
+
+// Alur cetak di sisi sol
+rim(-0.42, 1.072, 0.016, new THREE.MeshStandardMaterial({ color: "#2a5f9c", roughness: 0.5 }), "Outsole_groove_upper");
+rim(-0.8, 1.072, 0.016, new THREE.MeshStandardMaterial({ color: "#1d4a86", roughness: 0.5 }), "Outsole_groove_lower");
+
+// Kembangan sol (lug + chevron) di bagian bawah
+{
+  const lugs = [], chevrons = [];
+  const N = 17;
+  for (let i = 0; i < N; i++) {
+    const t = 0.07 + (i / (N - 1)) * 0.82;
+    const x = (t - 0.5) * L * 1.035;
+    const yb = soleBottom(t);
+    const slope = Math.atan2(soleBottom(t + 0.01) - soleBottom(t - 0.01), 0.02 * L * 1.035);
+    const w = footW(t) * 1.07 * Math.pow(Math.sin(Math.PI * t), 0.2);
+    for (const sgn of [-1, 1]) {
+      const lug = new THREE.BoxGeometry(0.32, 0.08, w * 0.42);
+      lug.rotateZ(slope);
+      lug.translate(x, yb - 0.03, sgn * w * 0.5);
+      lugs.push(lug);
+      if (i < N - 1) {
+        const ch = new THREE.BoxGeometry(0.09, 0.06, w * 0.38);
+        ch.rotateY(sgn * 0.6);
+        ch.rotateZ(slope);
+        ch.translate(x + 0.26, yb - 0.02, sgn * w * 0.17);
+        chevrons.push(ch);
+      }
+    }
+  }
+  const lugMesh = new THREE.Mesh(mergeGeometries(lugs), new THREE.MeshStandardMaterial({ color: "#123a72", roughness: 0.8 }));
+  lugMesh.name = "Tread_lugs";
+  const chMesh = new THREE.Mesh(mergeGeometries(chevrons), new THREE.MeshStandardMaterial({ color: "#1b4f92", roughness: 0.8 }));
+  chMesh.name = "Tread_chevrons";
+  shoe.add(lugMesh, chMesh);
+}
+
 shoe.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+shoe.position.y = 0.07;
 scene.add(shoe);
 
 // ---------- Kamera & kontrol ----------
@@ -356,6 +468,7 @@ const views = {
   default: { pos: [4, 4.5, 13.5], target: [0, 1.9, 0] },
   side: { pos: [0, 2.2, 15], target: [0, 1.9, 0] },
   top: { pos: [0.01, 15, 0.01], target: [0, 1.5, 0] },
+  bottom: { pos: [0.01, -13, 2], target: [0, 0.5, 0] },
 };
 let tween = null;
 const clock = new THREE.Clock();
@@ -371,6 +484,7 @@ function setAutoRotate(on) { controls.autoRotate = on; rotateBtn.setAttribute("a
 rotateBtn.addEventListener("click", () => setAutoRotate(!controls.autoRotate));
 document.getElementById("btn-side").addEventListener("click", () => { setAutoRotate(false); goTo("side"); });
 document.getElementById("btn-top").addEventListener("click", () => { setAutoRotate(false); goTo("top"); });
+document.getElementById("btn-bottom").addEventListener("click", () => { setAutoRotate(false); goTo("bottom"); });
 document.getElementById("btn-reset").addEventListener("click", () => goTo("default"));
 controls.addEventListener("start", () => { tween = null; });
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setAutoRotate(false);
@@ -395,6 +509,7 @@ renderer.setAnimationLoop(() => {
     if (tween.k >= 1) tween = null;
   }
   controls.update();
+  ground.visible = camera.position.y > 0;
   renderer.render(scene, camera);
 });
 
