@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClickSole — Konfigurator Sepatu</title>
+  <meta name="description" content="Rancang sepatu ClickSole Anda: pilih upper dan sol favorit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#">Click<span>Sole</span></a>
+    <span class="tagline">Konfigurator Sepatu</span>
+  </header>
+
+  <main class="configurator">
+    <section class="stage" aria-label="Pratinjau sepatu">
+      <div class="shoe-frame">
+        <img id="shoe-a" class="shoe is-visible" src="1A.png" alt="Sepatu ClickSole">
+        <img id="shoe-b" class="shoe" src="1A.png" alt="" aria-hidden="true">
+      </div>
+      <p class="eyebrow">Kombinasi Anda</p>
+      <h1 id="combo-name" class="combo-name" aria-live="polite">Blue Stripes Upper + Blue Fade Sole</h1>
+    </section>
+
+    <section class="panel" aria-label="Pilihan">
+      <div class="option-group">
+        <div class="group-head">
+          <h2>Upper</h2>
+          <span id="upper-label" class="current">Blue Stripes</span>
+        </div>
+        <div id="upper-options" class="options" role="radiogroup" aria-label="Pilih upper"></div>
+      </div>
+
+      <div class="option-group">
+        <div class="group-head">
+          <h2>Sol</h2>
+          <span id="sole-label" class="current">Blue Fade</span>
+        </div>
+        <div id="sole-options" class="options" role="radiogroup" aria-label="Pilih sol"></div>
+      </div>
+
+      <button type="button" class="buy-btn">Beli sekarang</button>
+    </section>
+  </main>
+
+  <footer class="site-footer">© ClickSole</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
