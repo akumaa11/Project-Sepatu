@@ -21,3 +21,7 @@ Website satu halaman (HTML, CSS, dan JavaScript biasa) untuk memilih kombinasi u
 | A    | Blue Stripes | 1    | Blue Fade   |
 | B    | Circles      | 2    | Sunset Fade |
 | C    | Curved Lines | 3    | Green Fade  |
+
+## Model 3D (sepatu 1A)
+- `sepatu-3d.html` — penampil 3D interaktif (Three.js). Buka di browser (perlu internet untuk memuat Three.js). Seret untuk memutar, scroll/cubit untuk zoom.
+- `sepatu-1A.glb` — file model 3D yang sama, bisa dibuka di Blender, Windows 3D Viewer, atau https://gltf-viewer.donmccurdy.com
