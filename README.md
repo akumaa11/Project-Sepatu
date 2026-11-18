@@ -25,3 +25,13 @@ Website satu halaman (HTML, CSS, dan JavaScript biasa) untuk memilih kombinasi u
 ## Model 3D (sepatu 1A)
 - `sepatu-3d.html` — penampil 3D interaktif (Three.js). Buka di browser (perlu internet untuk memuat Three.js). Seret untuk memutar, scroll/cubit untuk zoom.
 - `sepatu-1A.glb` — file model 3D yang sama, bisa dibuka di Blender, Windows 3D Viewer, atau https://gltf-viewer.donmccurdy.com
+
+## Halaman produk 1A (model 3D)
+- `produk-1a.html` + `produk-1a.css` + `produk-1a.js` — halaman produk dengan model 3D interaktif.
+- Model dimuat dari file `.glb`, jadi halaman ini **perlu dibuka lewat server lokal** (tidak bisa klik dua kali):
+  ```bash
+  python3 -m http.server 8000
+  ```
+  lalu buka `http://localhost:8000/produk-1a.html`.
+- Mengganti dengan model dari Tripo: taruh file `.glb` di folder ini, lalu ubah `MODEL_URL` di baris atas `produk-1a.js`.
+  Ukuran dan posisi model disesuaikan otomatis; kalau arah hadapnya salah, ubah `MODEL_ROTATE_Y`.

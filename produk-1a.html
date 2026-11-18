@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ClickSole 1A</title>
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <meta name="description" content="ClickSole 1A: Blue Stripes Upper + Blue Fade Sole. Lihat sepatunya dalam 3D.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="produk-1a.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top">Click<span>Sole</span></a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="#viewer">Model 3D</a>
+        <a href="#detail">Detail</a>
+        <a href="#spesifikasi">Spesifikasi</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero: teks di kiri, model 3D di kanan -->
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">Edisi 1A</p>
+        <h1>Blue Stripes <em>&amp;</em> Blue&nbsp;Fade</h1>
+        <p class="lead">Upper putih bersih dengan tiga garis biru miring, berdiri di atas sol tebal bergradasi dari navy ke biru langit. Putar, perbesar, dan lihat setiap sisinya.</p>
+        <div class="hero-actions">
+          <button type="button" class="btn btn-primary">Beli sekarang</button>
+          <a class="btn btn-ghost" href="#detail">Lihat detail</a>
+        </div>
+        <dl class="mini-specs">
+          <div><dt>Upper</dt><dd>Blue Stripes</dd></div>
+          <div><dt>Sol</dt><dd>Blue Fade</dd></div>
+          <div><dt>Kode</dt><dd>1A</dd></div>
+        </dl>
+      </div>
+
+      <div class="viewer" id="viewer">
+        <div class="canvas-wrap" id="stage">
+          <div class="loader" id="loader" role="status">
+            <span class="loader-ring" aria-hidden="true"></span>
+            <span id="loader-text">Memuat model 3D… 0%</span>
+          </div>
+        </div>
+        <div class="viewer-bar">
+          <div class="view-buttons" role="group" aria-label="Sudut pandang">
+            <button type="button" data-view="hero" aria-pressed="true">3/4</button>
+            <button type="button" data-view="side" aria-pressed="false">Samping</button>
+            <button type="button" data-view="top" aria-pressed="false">Atas</button>
+            <button type="button" data-view="bottom" aria-pressed="false">Bawah</button>
+          </div>
+          <button type="button" class="spin-btn" id="btn-spin" aria-pressed="true">Putar otomatis</button>
+        </div>
+        <p class="viewer-hint">Seret untuk memutar · scroll atau cubit untuk zoom</p>
+      </div>
+    </section>
+
+    <!-- Detail: tiap kartu mengarahkan kamera ke bagian sepatu -->
+    <section class="detail wrap" id="detail">
+      <div class="section-head">
+        <p class="eyebrow">Detail</p>
+        <h2>Klik untuk melihat bagiannya di model</h2>
+      </div>
+      <div class="detail-grid">
+        <button type="button" class="detail-card" data-view="sole">
+          <span class="swatch swatch-sole" aria-hidden="true"></span>
+          <span class="detail-title">Sol Blue Fade</span>
+          <span class="detail-text">Sol tebal dengan gradasi navy di tumit ke biru langit di ujung, dibingkai lis hitam dan lis krom.</span>
+          <span class="detail-link">Lihat di model →</span>
+        </button>
+        <button type="button" class="detail-card" data-view="stripes">
+          <span class="swatch swatch-stripes" aria-hidden="true"></span>
+          <span class="detail-title">Tiga garis biru</span>
+          <span class="detail-text">Garis biru muda, biru, dan navy yang miring dari sol menuju tali, di kedua sisi sepatu.</span>
+          <span class="detail-link">Lihat di model →</span>
+        </button>
+        <button type="button" class="detail-card" data-view="laces">
+          <span class="swatch swatch-laces" aria-hidden="true"></span>
+          <span class="detail-title">Tali &amp; lubang logam</span>
+          <span class="detail-text">Enam pasang lubang tali bercincin logam, tali putih bersilang, dan lidah dengan label navy.</span>
+          <span class="detail-link">Lihat di model →</span>
+        </button>
+        <button type="button" class="detail-card" data-view="bottom">
+          <span class="swatch swatch-tread" aria-hidden="true"></span>
+          <span class="detail-title">Kembangan sol</span>
+          <span class="detail-text">Blok tread di dua sisi dan pola chevron di tengah untuk cengkeraman di berbagai permukaan.</span>
+          <span class="detail-link">Lihat di model →</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="specs wrap" id="spesifikasi">
+      <div class="section-head">
+        <p class="eyebrow">Spesifikasi</p>
+        <h2>ClickSole 1A</h2>
+      </div>
+      <dl class="spec-list">
+        <div><dt>Kombinasi</dt><dd>Blue Stripes Upper + Blue Fade Sole</dd></div>
+        <div><dt>Warna upper</dt><dd>Putih krem, aksen biru muda · biru · navy</dd></div>
+        <div><dt>Warna sol</dt><dd>Gradasi navy → biru langit</dd></div>
+        <div><dt>Aksen</dt><dd>Lis hitam &amp; krom, tab tumit navy</dd></div>
+        <div><dt>Model 3D</dt><dd>sepatu-1A.glb</dd></div>
+      </dl>
+      <button type="button" class="btn btn-primary btn-wide">Beli sekarang</button>
+    </section>
+  </main>
+
+  <footer class="site-footer wrap">
+    <span>© ClickSole</span>
+    <a href="index.html">Konfigurator semua kombinasi</a>
+  </footer>
+
+  <script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+  <script type="module" src="produk-1a.js"></script>
+</body>
+</html>
