@@ -27,11 +27,10 @@ Website satu halaman (HTML, CSS, dan JavaScript biasa) untuk memilih kombinasi u
 - `sepatu-1A.glb` — file model 3D yang sama, bisa dibuka di Blender, Windows 3D Viewer, atau https://gltf-viewer.donmccurdy.com
 
 ## Halaman produk 1A (model 3D)
-- `produk-1a.html` + `produk-1a.css` + `produk-1a.js` — halaman produk dengan model 3D interaktif.
-- Model dimuat dari file `.glb`, jadi halaman ini **perlu dibuka lewat server lokal** (tidak bisa klik dua kali):
+- `produk-1a.html` + `produk-1a.css` — halaman produk dengan model 3D interaktif. Bisa dibuka dengan klik dua kali (perlu internet untuk memuat Three.js).
+- `sepatu-1A.glb` — model utama. `sepatu-1A-model.js` — salinan model yang sama sebagai cadangan, dipakai saat file `.glb` tidak bisa diambil (misalnya saat dibuka dengan klik dua kali).
+- Mengganti dengan model dari Tripo: taruh file `.glb` di folder ini, ubah `MODEL_URL` di dalam `produk-1a.html`, lalu buka lewat server lokal:
   ```bash
   python3 -m http.server 8000
   ```
-  lalu buka `http://localhost:8000/produk-1a.html`.
-- Mengganti dengan model dari Tripo: taruh file `.glb` di folder ini, lalu ubah `MODEL_URL` di baris atas `produk-1a.js`.
-  Ukuran dan posisi model disesuaikan otomatis; kalau arah hadapnya salah, ubah `MODEL_ROTATE_Y`.
+  dan buka `http://localhost:8000/produk-1a.html`. Ukuran dan posisi model disesuaikan otomatis; kalau arah hadapnya salah, ubah `MODEL_ROTATE_Y`.
